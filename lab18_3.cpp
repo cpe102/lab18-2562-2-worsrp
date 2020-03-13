@@ -7,7 +7,7 @@
 
 using namespace std;
 
-struct student{
+struct student{//Define struct student with four member (name ,id , gender, gpa);
     string name;
     int id;
     char gender;
@@ -21,7 +21,7 @@ struct course{
     vector<student *> student_list;
 };
 
-student *findstudent(vector<student> allstudents,float key){ //Correct this line
+student * findstudent(vector<student> &allstudents,int key){ //Correct this line
     for(unsigned int i = 0; i < allstudents.size(); i++){
         if(allstudents[i].id  == key) return &allstudents[i];
     }
@@ -39,7 +39,7 @@ void printreport(vector<course> allcourses){
         cout << "\n\nStudents:\t";
         for(unsigned int j = 0; j < allcourses[i].student_list.size();j++){
             if(j != 0) cout << "\t\t";
-            cout << setw(15) << left << allcourses[i].student_list[j]->name << "\t";
+            cout << setw(20) << left << allcourses[i].student_list[j]->name << "\t";
             cout << allcourses[i].student_list[j]->id << "\t";
             cout << allcourses[i].student_list[j]->gender << "\t";
             cout << allcourses[i].student_list[j]->gpa << "\n";
@@ -56,13 +56,13 @@ int main(){
     vector<course> allcourses;
 
     string textline;
-    char format[] = "%[^,],%d,%c,%f";
-    char namedata[100],gender;
-    int stdID;
-    float gpa;
+    char namedata[100];
+    student s;
     while(getline(student_file,textline)){
-        sscanf(textline.c_str(),format,namedata,&stdID,&gender,&gpa);
-        student s={namedata,stdID,gender,gpa};
+        student s;
+        //Assign value to the members of struct s;
+        sscanf(textline.c_str(),"%[^,],%d,%c,%f",namedata,&s.id,&s.gender,&s.gpa);
+        s.name=namedata;
         allstudents.push_back(s);
     }
 
@@ -74,23 +74,22 @@ int main(){
             c.name = textline.substr(0,loc-1);
             c.id = atof(textline.substr(loc+1,5).c_str());
             getline(course_file,textline);
-
             allcourses.push_back(c);
             state = 2;
         }else if(state == 2){
             if(textline == "> Students"){
                 state = 3;
             }else{
-                allcourses[allcourses.size()-1].lecture_list.push_back(textline);
+                allcourses[allcourses.size()-1].lecture_list.push_back(textline.c_str());
                 //Append lecture_list;
             }
         }else{
             if(textline == "---------------------------------------"){
                 state = 1;
             }else{
-                 student *p = findstudent(allstudents, atof(textline.c_str()));
-                 allcourses[allcourses.size()-1].student_list.push_back(p);
-                 //Append student_list;
+                student *p = findstudent(allstudents,atof(textline.c_str()));
+                allcourses[allcourses.size()-1].student_list.push_back(p);
+                //Append student_list;
             }
         }
     }
